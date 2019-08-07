@@ -5,14 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:E_Warehouse"
         xmlns:views ="clr-namespace:E_Warehouse.Views"
+        xmlns:st="http://schemas.spicytaco.io/"
         mc:Ignorable="d"
         
         Title="E-Warehouse">
-    
+
     <Window.Resources>
-        <DataTemplate x:Name="allCompanies" DataType="{x:Type views:AllCompanies}">
+        <DataTemplate DataType="{x:Type views:AllCompanies}">
         </DataTemplate>
-        <DataTemplate x:Name="Items" DataType="{x:Type views:Items}"></DataTemplate>
+        <DataTemplate DataType="{x:Type views:Items}"></DataTemplate>
+        <DataTemplate DataType="{x:Type views:SearchItem}"></DataTemplate>
     </Window.Resources>
 
     <Grid ShowGridLines="false" Margin="0">
@@ -31,7 +33,7 @@
                 <MenuItem Header="_Show All Items" Click="MenuItem_DB_Items_OnClick"></MenuItem>
             </MenuItem>
         </Menu>
-        <ContentControl Content="{Binding}" Margin="0" Grid.Row="1"/>
+        <ContentControl Content="{Binding}" Margin="0" Grid.Row="1">
+        </ContentControl>
     </Grid>
-
 </Window>

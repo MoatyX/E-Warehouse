@@ -14,8 +14,8 @@ namespace E_Warehouse
         {
             InitializeComponent();
 
-            ItemModel model = new ItemModel();
-            model.Companies.Load();
+            //on start, load the search view
+            MenuItem_Search_OnClick(null, null);
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace E_Warehouse
         /// <param name="e"></param>
         private void MenuItem_Search_OnClick(object sender, RoutedEventArgs e)
         {
-            
+            DataContext = new SearchItem();
         }
 
         private void MenuItem_DB_AllCompanies_OnClick(object sender, RoutedEventArgs e)

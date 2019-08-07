@@ -30,15 +30,48 @@ namespace E_Warehouse.Views
 
         public Item SelectedItem => itemListView.SelectedItem is Item item ? item : null;
         private bool _rowInitPass;
+        private bool _noMatch;
 
 
-        public Items()
+        /// <summary>
+        /// Constructor that takes 2 parameters, defining the behaviour of the view
+        /// </summary>
+        /// <param name="viewMode">whether to display a single item, batch or all of them</param>
+        /// <param name="partNumber">in the case of single item, partnumber is given to get that item</param>
+        public Items(params string[] partNumber)
         {
             InitializeComponent();
 
             _dataContextModel = new ItemModel();
-            _dataContextModel.Items.Include(x => x.SourceCompanies).Load();
-            _itemsViewSource = _dataContextModel.Items.Local;
+
+            //alter the collection based on the ItemDisplayMode
+            switch (partNumber.Length)
+            {
+                case 0:
+                    _dataContextModel.Items.Include(x => x.SourceCompanies).Load();
+                    _itemsViewSource = _dataContextModel.Items.Local;
+                    break;
+                case 1:
+                    string itemToFind = partNumber[0];
+                    var item = _dataContextModel.Items.Include(x => x.SourceCompanies)
+                        .FirstOrDefault(x => x.PartNumber.Equals(itemToFind, StringComparison.CurrentCultureIgnoreCase));
+                    if (item == null)
+                    {
+                        _noMatch = true;
+                    }
+                        
+                    _itemsViewSource = new ObservableCollection<Item> {item};
+                    break;
+                default:
+                    var items = _dataContextModel.Items.Where(x =>
+                        partNumber.Contains(x.PartNumber, StringComparer.CurrentCultureIgnoreCase)).ToList();
+                    if (items.Count == 0)
+                    {
+                        _noMatch = true;
+                    }
+                    _itemsViewSource = new ObservableCollection<Item>(items);
+                    break;
+            }
 
             _itemSourceCompanies = new DataTable();
             _itemSourceCompanies.Columns.Add(new DataColumn("CompanyName"));
@@ -46,6 +79,16 @@ namespace E_Warehouse.Views
 
             _itemSourceCompanies.RowDeleting += ItemSourceCompaniesOnRowDelete;
             _itemSourceCompanies.RowChanged += ItemSourceCompaniesOnRowChanged;
+        }
+
+        /// <summary>
+        /// shows an error dialog that the search was unsuccessful and returns to the search window
+        /// </summary>
+        private void NoMatchFound()
+        {
+            MessageBox.Show("Could not find a match", "Not found", MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            Application.Current.MainWindow.DataContext = new SearchItem();
         }
 
         private void ItemSourceCompaniesOnRowDelete(object sender, DataRowChangeEventArgs e)
@@ -131,8 +174,13 @@ namespace E_Warehouse.Views
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            if (DesignerProperties.GetIsInDesignMode(this)) return;
+            if (_noMatch)
+            {
+                NoMatchFound();
+                return;
+            }
 
+            if (DesignerProperties.GetIsInDesignMode(this)) return;
             if (FindResource("itemViewSource") is CollectionViewSource itemsView)
             {
                 itemsView.Source = _itemsViewSource;
@@ -140,6 +188,7 @@ namespace E_Warehouse.Views
             }
 
             _defaultColorBrush = itemListView.Background;
+
         }
 
         private void BtnAdd_Click(object sender, RoutedEventArgs e)
