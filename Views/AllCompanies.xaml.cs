@@ -38,7 +38,7 @@ namespace E_Warehouse.Views
             InitializeComponent();
 
             _dataContextModel = new ItemModel();
-            _dataContextModel.Companies.Load();
+            _dataContextModel.Companies.Include(x => x.Items).Load();
         }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
@@ -48,6 +48,7 @@ namespace E_Warehouse.Views
             if (FindResource("companyViewSource") is CollectionViewSource companiesList)
             {
                 companiesList.Source = Companies;
+                var x = FindResource("companyItemsViewSource") as CollectionViewSource;
             }
 
             _defaultColorBrush = companyDetailGrid.Background;
@@ -110,6 +111,7 @@ namespace E_Warehouse.Views
 
         private void BtnCommit_Click(object sender, RoutedEventArgs e)
         {
+            int changes = 0;
             if (NewCompanyState)
             {
                 Company company = new Company
@@ -119,11 +121,16 @@ namespace E_Warehouse.Views
                 };
 
                 Companies.Add(company);
-                _dataContextModel.SaveChanges();
+                changes = _dataContextModel.SaveChanges();
             }
 
             SetupEntryDisplayMode();
-            _dataContextModel.SaveChanges();
+            changes += _dataContextModel.SaveChanges();
+
+            if (changes > 0)
+                MessageBox.Show($"{changes} Changes have been applied", "Info", MessageBoxButton.OK);
+            else
+                MessageBox.Show("No Changes have been detected to apply", "info", MessageBoxButton.OK);
         }
 
         private void BtnDelete_Click(object sender, RoutedEventArgs e)

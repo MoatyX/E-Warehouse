@@ -4,21 +4,19 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:E_Warehouse.Views"
-             xmlns:Models="clr-namespace:E_Warehouse.Models"
-             xmlns:converts="clr-namespace:E_Warehouse.Converts"
+             xmlns:models="clr-namespace:E_Warehouse.Models"
+             xmlns:st="http://schemas.spicytaco.io/"
              x:Class="E_Warehouse.Views.Items"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" Loaded="UserControl_Loaded">
     <UserControl.Resources>
-        <converts:VisibilityToggleConverter x:Key="VisibilityToggleConverter"></converts:VisibilityToggleConverter>
         <Style x:Key="NavButton" TargetType="{x:Type Button}" BasedOn="{x:Null}">
             <Setter Property="FontSize" Value="24"/>
             <Setter Property="Margin" Value="2,2,2,0"/>
             <Setter Property="Width" Value="40"/>
             <Setter Property="Height" Value="auto"/>
         </Style>
-        <CollectionViewSource x:Key="itemViewSource" d:DesignSource="{d:DesignInstance {x:Type Models:Item}, CreateList=True}"/>
-        <CollectionViewSource x:Key="itemSourceCompaniesViewSource" Source="{Binding SourceCompanies, Source={StaticResource itemViewSource}}"/>
+        <CollectionViewSource x:Key="itemViewSource" d:DesignSource="{d:DesignInstance {x:Type models:Item}, CreateList=True}"/>
     </UserControl.Resources>
     <Grid DataContext="{StaticResource itemViewSource}">
         <Grid.RowDefinitions>
@@ -92,12 +90,12 @@
             <Label Content="Sell Price:" Grid.Column="0" HorizontalAlignment="Left" Margin="3" Grid.Row="5" VerticalAlignment="Center"/>
             <TextBox x:Name="sellPriceTextBox" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="3" Grid.Row="5" Text="{Binding SellPrice, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" VerticalAlignment="Center" Width="120"/>
         </Grid>
-        <StackPanel Grid.Row="2" Grid.Column="1">
+        <st:StackPanel Grid.Row="2" Grid.Column="1" Orientation="Vertical" MarginBetweenChildren="2" Margin="10">
             <Label Content="Item's Source Companies Data: " Background="Aquamarine"></Label>
-            <DataGrid VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" x:Name="sourceCompaniesDataGrid" AutoGenerateColumns="True" EnableRowVirtualization="True"
-                      RowDetailsVisibilityMode="VisibleWhenSelected" Height="157">
+            <DataGrid st:StackPanel.Fill="Fill" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" x:Name="sourceCompaniesDataGrid" AutoGenerateColumns="True" EnableRowVirtualization="True"
+                      RowDetailsVisibilityMode="VisibleWhenSelected" Height="auto">
             </DataGrid>
-        </StackPanel>
+        </st:StackPanel>
 
     </Grid>
 </UserControl>

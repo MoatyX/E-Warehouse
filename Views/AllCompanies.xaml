@@ -5,7 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:E_Warehouse.Views"
              xmlns:converters="clr-namespace:E_Warehouse.Converts"
-             xmlns:Models="clr-namespace:E_Warehouse.Models" x:Class="E_Warehouse.Views.AllCompanies"
+             xmlns:Models="clr-namespace:E_Warehouse.Models"
+             xmlns:st="http://schemas.spicytaco.io/"
+             x:Class="E_Warehouse.Views.AllCompanies"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" Loaded="UserControl_Loaded">
     <UserControl.Resources>
@@ -17,17 +19,19 @@
             <Setter Property="Height" Value="auto"/>
         </Style>
         <CollectionViewSource x:Key="companyViewSource" d:DesignSource="{d:DesignInstance {x:Type Models:Company}, CreateList=True}"/>
+        <CollectionViewSource x:Key="companyItemsViewSource" Source="{Binding Items, Source={StaticResource companyViewSource}}"/>
     </UserControl.Resources>
     <Grid x:Name="grid" DataContext="{StaticResource companyViewSource}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="411*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
             <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
-        <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="5,2,2,0" Height="36" VerticalAlignment="Top"
+        <StackPanel  Grid.Column="1" Orientation="Horizontal" Margin="5,2,2,0" Height="36" VerticalAlignment="Top"
                     Background="Gainsboro" DataContext="{StaticResource companyViewSource}">
             <Button Name="BtnAdd" Content="New Company" FontSize="11"
                     Width="auto" Style="{StaticResource NavButton}" Click="BtnAdd_Click"/>
@@ -37,7 +41,7 @@
                     Width="80" Style="{StaticResource NavButton}" Click="BtnCommit_Click"/>
             <Button x:Name="BtnCancel" Visibility="Hidden" Click="BtnCancel_OnClick" Content="Cancel" Width="75" IsCancel="True"/>
         </StackPanel>
-        <ListView x:Name="companyListView"  Grid.ColumnSpan="1" Grid.RowSpan="2" ItemsSource="{Binding}" Margin="0,0,0,-0.4" SelectionMode="Single">
+        <ListView x:Name="companyListView"  Grid.ColumnSpan="1" Grid.RowSpan="999" ItemsSource="{Binding}" Margin="0,0,0,-0.4" SelectionMode="Single">
             <ListView.ItemContainerStyle>
                 <Style>
                     <Setter Property="Control.HorizontalContentAlignment" Value="Stretch"/>
@@ -56,7 +60,7 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        <Grid x:Name="companyDetailGrid" Grid.Column="1" HorizontalAlignment="Left" Margin="10,1.6,0,0" Grid.Row="1" VerticalAlignment="Top" Height="375" Width="580">
+        <Grid x:Name="companyDetailGrid" Grid.Column="1" HorizontalAlignment="Left" Margin="10,1.6,0,0" Grid.Row="1" VerticalAlignment="Top" Height="auto" Width="580">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
@@ -77,6 +81,20 @@
             <Label Content="Name:" Grid.Column="0" HorizontalAlignment="Left" Margin="3" Grid.Row="3" VerticalAlignment="Center"/>
             <TextBox x:Name="CompanyNameTextBox" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="3" Grid.Row="3" Text="{Binding Name, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" VerticalAlignment="Center" Width="120"/>
         </Grid>
+        <st:StackPanel Grid.Row="2" Grid.Column="1" Orientation="Vertical" MarginBetweenChildren="2" Margin="10">
+            <Label Background="Aquamarine" Width="auto" Content="Items Linked to this Company (Currently Items from Source Companies)"></Label>
+            <DataGrid st:StackPanel.Fill="Fill" x:Name="itemsDataGrid" AutoGenerateColumns="False" Grid.Column="1" EnableRowVirtualization="True" ItemsSource="{Binding Source={StaticResource companyItemsViewSource}}" Grid.Row="2" Grid.RowSpan="1" RowDetailsVisibilityMode="VisibleWhenSelected">
+                <DataGrid.Columns>
+                    <DataGridTextColumn MinWidth="50" x:Name="idColumn" Binding="{Binding Id}" IsReadOnly="True" Header="Id" Width="SizeToHeader"/>
+                    <DataGridTextColumn MinWidth="80" x:Name="buyPriceColumn" Binding="{Binding BuyPrice}" IsReadOnly="True" Header="Buy Price" Width="SizeToHeader"/>
+                    <DataGridTextColumn MinWidth="120" x:Name="nameColumn1" Binding="{Binding Name}" IsReadOnly="True" Header="Name" Width="SizeToHeader"/>
+                    <DataGridTextColumn MinWidth="100" x:Name="partNumberColumn" Binding="{Binding PartNumber}" IsReadOnly="True" Header="Part Number" Width="SizeToHeader"/>
+                    <DataGridTextColumn MinWidth="80" x:Name="quantityColumn" Binding="{Binding Quantity}" IsReadOnly="True" Header="Quantity" Width="SizeToHeader"/>
+                    <DataGridTextColumn MinWidth="100" x:Name="sellPriceColumn" Binding="{Binding SellPrice}" IsReadOnly="True" Header="Sell Price" Width="SizeToHeader"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </st:StackPanel>
+
 
     </Grid>
 </UserControl>
