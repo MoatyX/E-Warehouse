@@ -11,12 +11,12 @@
              d:DesignHeight="450" d:DesignWidth="800" Loaded="UserControl_Loaded">
     <UserControl.Resources>
         <Style x:Key="NavButton" TargetType="{x:Type Button}" BasedOn="{x:Null}">
-            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontSize" Value="20"/>
             <Setter Property="Margin" Value="2,2,2,0"/>
-            <Setter Property="Width" Value="40"/>
             <Setter Property="Height" Value="auto"/>
         </Style>
         <CollectionViewSource x:Key="itemViewSource" d:DesignSource="{d:DesignInstance {x:Type models:Item}, CreateList=True}"/>
+        <CollectionViewSource x:Key="itemTransactionsViewSource" Source="{Binding Transactions, Source={StaticResource itemViewSource}}"/>
     </UserControl.Resources>
     <Grid DataContext="{StaticResource itemViewSource}">
         <Grid.RowDefinitions>
@@ -28,7 +28,7 @@
             <ColumnDefinition Width="1*"/>
             <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
-        <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="5,2,2,0" Height="36" VerticalAlignment="Top"
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="5,2,2,0" VerticalAlignment="Top"
                     Background="Gainsboro">
             <Button Name="BtnAdd" Content="New Item" FontSize="12"
                     Width="auto" Style="{StaticResource NavButton}" Click="BtnAdd_Click"/>
@@ -37,8 +37,9 @@
             <Button Name="BtnCommit" Content="Apply Changes" Background="Green" FontSize="11"
                     Width="80" Style="{StaticResource NavButton}" Click="BtnCommit_Click"/>
             <Button x:Name="BtnCancel" Style="{StaticResource NavButton}" Visibility="Collapsed" Click="BtnCancel_OnClick" Content="Cancel" Width="75" IsCancel="True"/>
+            <Button x:Name="BtnNewCompany" Style="{StaticResource NavButton}" Visibility="Visible" Content="Add Company Record" Width="auto" IsCancel="True" Click="BtnNewCompany_Click"/>
         </StackPanel>
-        <ListView x:Name="itemListView" SelectionChanged="ItemListView_OnSelectionChanged" SelectionMode="Single" Grid.RowSpan="3" ItemsSource="{Binding}" Grid.ColumnSpan="1" Margin="0,0,0,-0.4">
+        <ListView x:Name="itemListView" SelectionMode="Single" Grid.RowSpan="3" ItemsSource="{Binding}" Grid.ColumnSpan="1" Margin="0,0,0,-0.4">
             <ListView.View>
                 <GridView>
                     <GridViewColumn x:Name="nameColumn" Width="80" Header="Name">
@@ -91,10 +92,15 @@
             <TextBox x:Name="sellPriceTextBox" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="3" Grid.Row="5" Text="{Binding SellPrice, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" VerticalAlignment="Center" Width="120"/>
         </Grid>
         <st:StackPanel Grid.Row="2" Grid.Column="1" Orientation="Vertical" MarginBetweenChildren="2" Margin="10">
-            <Label Content="Item's Source Companies Data: " Background="Aquamarine"></Label>
-            <DataGrid st:StackPanel.Fill="Fill" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" x:Name="sourceCompaniesDataGrid" AutoGenerateColumns="True" EnableRowVirtualization="True"
-                      RowDetailsVisibilityMode="VisibleWhenSelected" Height="auto">
+            <Label Content="Item's NewTransactions Data: " Background="Aquamarine"></Label>
+            <DataGrid x:Name="transactionsDataGrid" AutoGenerateColumns="False" EnableRowVirtualization="True" ItemsSource="{Binding Source={StaticResource itemTransactionsViewSource}}" RowDetailsVisibilityMode="VisibleWhenSelected">
+                <DataGrid.Columns>
+                    <DataGridTextColumn x:Name="companyColumn" Binding="{Binding Company.Name}" Header="Company Name" Width="SizeToHeader"/>
+                    <DataGridTextColumn x:Name="itemTransactionTypeColumn" Binding="{Binding ItemTransactionType}" Header="NewTransaction Type" Width="SizeToHeader"/>
+                    <DataGridTextColumn x:Name="priceColumn" Binding="{Binding Price}" Header="Price" MinWidth="80" Width="SizeToHeader"/>
+                </DataGrid.Columns>
             </DataGrid>
+
         </st:StackPanel>
 
     </Grid>

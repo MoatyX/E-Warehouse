@@ -78,13 +78,21 @@
     <Compile Include="Migrations\201908032304336_InitialCreate.Designer.cs">
       <DependentUpon>201908032304336_InitialCreate.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201908090841289_Transactions.cs" />
+    <Compile Include="Migrations\201908090841289_Transactions.Designer.cs">
+      <DependentUpon>201908090841289_Transactions.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Models\ItemTransaction.cs" />
     <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Views\AllCompanies.xaml.cs">
       <DependentUpon>AllCompanies.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Items.xaml.cs">
       <DependentUpon>Items.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Modals\ItemCompanyEntryWindow.xaml.cs">
+      <DependentUpon>ItemCompanyEntryWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SearchItem.xaml.cs">
       <DependentUpon>SearchItem.xaml</DependentUpon>
@@ -107,6 +115,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Items.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Modals\ItemCompanyEntryWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -133,6 +145,9 @@
     </Compile>
     <EmbeddedResource Include="Migrations\201908032304336_InitialCreate.resx">
       <DependentUpon>201908032304336_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201908090841289_Transactions.resx">
+      <DependentUpon>201908090841289_Transactions.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

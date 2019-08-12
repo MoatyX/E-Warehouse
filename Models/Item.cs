@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace E_Warehouse.Models
 {
@@ -16,5 +13,7 @@ namespace E_Warehouse.Models
         public int Quantity { get; set; }
 
         public ICollection<Company> SourceCompanies { get; set; }
+
+        public ICollection<ItemTransaction> Transactions { get; set; }
     }
 }

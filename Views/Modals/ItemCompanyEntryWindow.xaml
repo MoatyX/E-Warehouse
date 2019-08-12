@@ -1,0 +1,40 @@
+﻿<Window x:Class="E_Warehouse.Views.Modals.ItemCompanyEntryWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:st="http://schemas.spicytaco.io/"
+        xmlns:wpfTextBoxAutoComplete="clr-namespace:WPFTextBoxAutoComplete;assembly=WPFTextBoxAutoComplete"
+        xmlns:modals="clr-namespace:E_Warehouse.Views.Modals"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        mc:Ignorable="d"
+        Title="New Source Company"  Height="200" Width="450" WindowStyle="ToolWindow" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+    <st:AutoGrid Rows="Auto,Auto,auto,auto,*, 28" Columns="Auto, *" ChildMargin="3" Margin="0,5,0,0">
+        <Label Content="Company Name: "></Label>
+        <TextBox Name="CompanyNameTextbox"
+            wpfTextBoxAutoComplete:AutoCompleteBehavior.AutoCompleteItemsSource="{Binding CompanyNames}" 
+            wpfTextBoxAutoComplete:AutoCompleteBehavior.AutoCompleteStringComparison="InvariantCultureIgnoreCase"
+        />
+
+        <Label Content="NewTransaction Type"></Label>
+        <ComboBox Name="TransactionType" SelectedIndex="0"></ComboBox>
+
+        <Label Content="Price"></Label>
+        <TextBox Name="PriceTextbox"></TextBox>
+
+        <Label Content="Transaction Date"></Label>
+        <DatePicker Name="TransactionDate" SelectedDate="{x:Static sys:DateTime.Today}" ></DatePicker>
+
+        <Label />
+        <Label />
+
+        <Label />
+        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+            <Button Click="OkBtn_OnClick" HorizontalAlignment="Right" 
+                    MinWidth="80" Content="Ok"  />
+            <Button Click="CancelBtn_OnClick" HorizontalAlignment="Right" 
+                    MinWidth="80" Content="Cancel" IsCancel="True" Margin="10,0,0,0"  />
+        </StackPanel>
+
+    </st:AutoGrid>
+</Window>

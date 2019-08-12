@@ -12,6 +12,7 @@ using System.Windows.Media;
 using E_Warehouse.Data;
 using E_Warehouse.Models;
 using E_Warehouse.Utils;
+using E_Warehouse.Views.Modals;
 
 namespace E_Warehouse.Views
 {
@@ -26,11 +27,10 @@ namespace E_Warehouse.Views
         private bool _newItemMode;
 
         private Brush _defaultColorBrush;
-        private readonly DataTable _itemSourceCompanies;
 
         public Item SelectedItem => itemListView.SelectedItem is Item item ? item : null;
         private bool _rowInitPass;
-        private bool _noMatch;
+        private readonly bool _noMatch;
 
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace E_Warehouse.Views
             switch (partNumber.Length)
             {
                 case 0:
-                    _dataContextModel.Items.Include(x => x.SourceCompanies).Load();
+                    _dataContextModel.Items.Include(x => x.Transactions.Select(y => y.Company)).Load();
                     _itemsViewSource = _dataContextModel.Items.Local;
                     break;
                 case 1:
@@ -72,13 +72,6 @@ namespace E_Warehouse.Views
                     _itemsViewSource = new ObservableCollection<Item>(items);
                     break;
             }
-
-            _itemSourceCompanies = new DataTable();
-            _itemSourceCompanies.Columns.Add(new DataColumn("CompanyName"));
-            RefreshSourceCompanies((Item)itemListView.SelectedItem);
-
-            _itemSourceCompanies.RowDeleting += ItemSourceCompaniesOnRowDelete;
-            _itemSourceCompanies.RowChanged += ItemSourceCompaniesOnRowChanged;
         }
 
         /// <summary>
@@ -89,87 +82,6 @@ namespace E_Warehouse.Views
             MessageBox.Show("Could not find a match", "Not found", MessageBoxButton.OK,
                     MessageBoxImage.Error);
             Application.Current.MainWindow.DataContext = new SearchItem();
-        }
-
-        private void ItemSourceCompaniesOnRowDelete(object sender, DataRowChangeEventArgs e)
-        {
-            if(_rowInitPass) return;
-            if (e.Action != DataRowAction.Delete) return;
-
-            var sourceCompanies = _itemsViewSource[itemListView.SelectedIndex].SourceCompanies;
-            sourceCompanies.Remove(sourceCompanies.First(x => x.Name.Equals((string)e.Row.ItemArray[0])));
-        }
-
-        private void ItemSourceCompaniesOnRowChanged(object sender, DataRowChangeEventArgs e)
-        {
-            if(_rowInitPass) return;
-            switch (e.Action)
-            {
-                case DataRowAction.Change:
-                    NewSourceCompanyEntryProcess(e.Row.ItemArray[0] as string);
-                    break;
-                case DataRowAction.Add:
-                    NewSourceCompanyEntryProcess(e.Row.ItemArray[0] as string);
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// the process of adding a new company entry to an item
-        /// </summary>
-        private void NewSourceCompanyEntryProcess(string companyName)
-        {
-            if (_newItemMode)
-            {
-                throw new Exception("Not yet supported");
-            }
-
-            //check if the added company name already exists or if we should create a new company
-            var addedCompany = companyName;
-            var potentialCompany = _dataContextModel.Companies.FirstOrDefault(x =>
-                x.Name.Equals(addedCompany, StringComparison.CurrentCultureIgnoreCase));
-            if (potentialCompany != null)
-            {
-                potentialCompany.IsSourceCompany = true;
-                SelectedItem.SourceCompanies.Add(potentialCompany);
-                _itemSourceCompanies.AcceptChanges();
-                return;
-            }
-
-            //no item was found in the database, create a new company then
-            var result =
-                MessageBox.Show(
-                    "The Entered Company name was not found in the database, should a new company with this name be created ?",
-                    "Company Not found", MessageBoxButton.YesNo, MessageBoxImage.Exclamation);
-
-            if (result == MessageBoxResult.Yes)
-            {
-                _itemsViewSource[itemListView.SelectedIndex].SourceCompanies.Add(new Company()
-                {
-                    IsSourceCompany = true,
-                    Name = addedCompany
-                });
-                _itemSourceCompanies.AcceptChanges();
-            }
-            else
-                _itemSourceCompanies.RejectChanges();
-
-        }
-
-        private void RefreshSourceCompanies(Item item)
-        {
-            _rowInitPass = true;
-            _itemSourceCompanies.Rows.Clear();
-            if (item == null) return;
-            foreach (var company in item.SourceCompanies)
-            {
-                if (company != null)
-                    _itemSourceCompanies.Rows.Add(company.Name);
-            }
-
-            _itemSourceCompanies.AcceptChanges();
-
-            _rowInitPass = false;
         }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
@@ -184,7 +96,7 @@ namespace E_Warehouse.Views
             if (FindResource("itemViewSource") is CollectionViewSource itemsView)
             {
                 itemsView.Source = _itemsViewSource;
-                sourceCompaniesDataGrid.ItemsSource = _itemSourceCompanies.DefaultView;
+                //transactionsDataGrid.ItemsSource = _itemTransactionsTable.DefaultView;
             }
 
             _defaultColorBrush = itemListView.Background;
@@ -226,7 +138,6 @@ namespace E_Warehouse.Views
             }
 
             changes += _dataContextModel.SaveChanges();
-            _itemSourceCompanies.AcceptChanges();
             itemListView.UpdateLayout();
             SetupEntryDisplayMode();
 
@@ -262,9 +173,21 @@ namespace E_Warehouse.Views
             DataContext = itemListView;
         }
 
-        private void ItemListView_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void BtnNewCompany_Click(object sender, RoutedEventArgs e)
         {
-            RefreshSourceCompanies((Item)itemListView.SelectedItem);
+            ItemCompanyEntryWindow companyEntry =
+                new ItemCompanyEntryWindow(SelectedItem.Id, _dataContextModel.Companies.ToList())
+            {
+                Owner = Application.Current.MainWindow
+            };
+            var result = companyEntry.ShowDialog();
+
+            //as soon as we get a Dialog result, we continue executing here
+            if (result.HasValue && result.Value)
+            {
+                _itemsViewSource[itemListView.SelectedIndex].Transactions.Add(companyEntry.NewTransaction);
+                transactionsDataGrid.UpdateLayout();
+            }
         }
     }
 }
