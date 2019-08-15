@@ -74,15 +74,17 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converts\VisibilityToggleConverter.cs" />
-    <Compile Include="Migrations\201908032304336_InitialCreate.cs" />
-    <Compile Include="Migrations\201908032304336_InitialCreate.Designer.cs">
-      <DependentUpon>201908032304336_InitialCreate.cs</DependentUpon>
+    <Compile Include="Data\DataModelRepo.cs" />
+    <Compile Include="Migrations\201908151139165_Main.cs" />
+    <Compile Include="Migrations\201908151139165_Main.Designer.cs">
+      <DependentUpon>201908151139165_Main.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201908090841289_Transactions.cs" />
-    <Compile Include="Migrations\201908090841289_Transactions.Designer.cs">
-      <DependentUpon>201908090841289_Transactions.cs</DependentUpon>
+    <Compile Include="Migrations\201908151331296_ItemFix.cs" />
+    <Compile Include="Migrations\201908151331296_ItemFix.Designer.cs">
+      <DependentUpon>201908151331296_ItemFix.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Models\ItemStatistic.cs" />
     <Compile Include="Models\ItemTransaction.cs" />
     <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Views\AllCompanies.xaml.cs">
@@ -143,11 +145,11 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <EmbeddedResource Include="Migrations\201908032304336_InitialCreate.resx">
-      <DependentUpon>201908032304336_InitialCreate.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201908151139165_Main.resx">
+      <DependentUpon>201908151139165_Main.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201908090841289_Transactions.resx">
-      <DependentUpon>201908090841289_Transactions.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201908151331296_ItemFix.resx">
+      <DependentUpon>201908151331296_ItemFix.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

@@ -7,13 +7,13 @@ namespace E_Warehouse.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.2.0-61023")]
-    public sealed partial class Transactions : IMigrationMetadata
+    public sealed partial class Main : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Transactions));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Main));
         
         string IMigrationMetadata.Id
         {
-            get { return "201908090841289_Transactions"; }
+            get { return "201908151139165_Main"; }
         }
         
         string IMigrationMetadata.Source

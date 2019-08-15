@@ -10,7 +10,6 @@ namespace E_Warehouse.Migrations
         public Configuration()
         {
             AutomaticMigrationsEnabled = false;
-            ContextKey = "E_Warehouse.Data.ItemModel";
         }
 
         protected override void Seed(E_Warehouse.Data.ItemModel context)

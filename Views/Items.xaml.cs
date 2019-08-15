@@ -1,5 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using E_Warehouse.Data;
+using E_Warehouse.Models;
+using E_Warehouse.Views.Modals;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
@@ -9,10 +11,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
-using E_Warehouse.Data;
-using E_Warehouse.Models;
-using E_Warehouse.Utils;
-using E_Warehouse.Views.Modals;
 
 namespace E_Warehouse.Views
 {
@@ -21,15 +19,14 @@ namespace E_Warehouse.Views
     /// </summary>
     public partial class Items : UserControl
     {
-        private readonly ItemModel _dataContextModel;
+        private DataModelRepo DataModel => DataModelRepo.Instance;
+
         private readonly ObservableCollection<Item> _itemsViewSource;
 
         private bool _newItemMode;
-
         private Brush _defaultColorBrush;
 
         public Item SelectedItem => itemListView.SelectedItem is Item item ? item : null;
-        private bool _rowInitPass;
         private readonly bool _noMatch;
 
 
@@ -42,28 +39,24 @@ namespace E_Warehouse.Views
         {
             InitializeComponent();
 
-            _dataContextModel = new ItemModel();
-
             //alter the collection based on the ItemDisplayMode
             switch (partNumber.Length)
             {
                 case 0:
-                    _dataContextModel.Items.Include(x => x.Transactions.Select(y => y.Company)).Load();
-                    _itemsViewSource = _dataContextModel.Items.Local;
+                    _itemsViewSource = DataModel.Items;
                     break;
                 case 1:
                     string itemToFind = partNumber[0];
-                    var item = _dataContextModel.Items.Include(x => x.SourceCompanies)
-                        .FirstOrDefault(x => x.PartNumber.Equals(itemToFind, StringComparison.CurrentCultureIgnoreCase));
+                    var item = DataModel.Items.FirstOrDefault(x => x.PartNumber.Equals(itemToFind, StringComparison.CurrentCultureIgnoreCase));
                     if (item == null)
                     {
                         _noMatch = true;
                     }
-                        
-                    _itemsViewSource = new ObservableCollection<Item> {item};
+
+                    _itemsViewSource = new ObservableCollection<Item> { item };
                     break;
                 default:
-                    var items = _dataContextModel.Items.Where(x =>
+                    var items = DataModel.Items.Where(x =>
                         partNumber.Contains(x.PartNumber, StringComparer.CurrentCultureIgnoreCase)).ToList();
                     if (items.Count == 0)
                     {
@@ -77,7 +70,7 @@ namespace E_Warehouse.Views
         /// <summary>
         /// shows an error dialog that the search was unsuccessful and returns to the search window
         /// </summary>
-        private void NoMatchFound()
+        private static void NoMatchFound()
         {
             MessageBox.Show("Could not find a match", "Not found", MessageBoxButton.OK,
                     MessageBoxImage.Error);
@@ -96,48 +89,71 @@ namespace E_Warehouse.Views
             if (FindResource("itemViewSource") is CollectionViewSource itemsView)
             {
                 itemsView.Source = _itemsViewSource;
-                //transactionsDataGrid.ItemsSource = _itemTransactionsTable.DefaultView;
+            }
+
+            if (FindResource("itemStatisticViewSource") is CollectionViewSource itemView)
+            {
+                
             }
 
             _defaultColorBrush = itemListView.Background;
+            Console.WriteLine(SelectedItem);
 
         }
 
         private void BtnAdd_Click(object sender, RoutedEventArgs e)
         {
+            if (_newItemMode)
+            {
+                //we are actually in the process of Adding a new Entry, notify the user and return
+                MessageBox.Show("A new Item has been Added but not applied, Apply Changes first", "Unsaved Changes",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
             SetupNewEntryMode();
         }
 
         private void BtnDelete_Click(object sender, RoutedEventArgs e)
         {
+            if (_newItemMode)
+            {
+                //if we are in this mode, then the delete button will act as a cancel button
+                BtnCancel_OnClick(sender, e);
+                return;
+            }
+
             var result = MessageBox.Show("Are you sure you want to delete this item ?", "Item Delete",
                 MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
             if (result == MessageBoxResult.Yes)
             {
-                _dataContextModel.Items.Remove(SelectedItem);
+                DataModel.RemoveItem(SelectedItem);
             }
         }
 
         private void BtnCommit_Click(object sender, RoutedEventArgs e)
         {
-            var changes = 0;
+            var result = MessageBox.Show("Commit Changes ?", "Confirmation", MessageBoxButton.YesNo,
+                MessageBoxImage.Information);
+
+            if (result == MessageBoxResult.No)
+                return;
+
             if (_newItemMode)
             {
-                var newItem = new Item
-                {
-                    Name = ItemName.Text,
-                    BuyPrice = Convert.ToInt32(buyPriceTextBox.Text),
-                    SellPrice = Convert.ToInt32(sellPriceTextBox.Text),
-                    PartNumber = ItemPartNumber.Text,
-                    Quantity = Convert.ToInt32(quantityTextBox.Text)
-                };
+                var newItem = SelectedItem;
+                newItem.Name = nameTextBox.Text;
+                newItem.SellPrice = Convert.ToDouble(sellPriceTextBox.Text);
+                newItem.PartNumber = partNumberTextBox.Text;
+                newItem.Quantity = Convert.ToInt32(quantityTextBox.Text);
 
-                _dataContextModel.Items.Add(newItem);
-                changes = _dataContextModel.SaveChanges();
+                DataModel.AddItem(newItem);
+
+                _newItemMode = false;
             }
 
-            changes += _dataContextModel.SaveChanges();
+            int changes = DataModel.SaveChanges();
             itemListView.UpdateLayout();
             SetupEntryDisplayMode();
 
@@ -158,35 +174,70 @@ namespace E_Warehouse.Views
 
             ItemDetailView.Background = Brushes.Aquamarine;
             _newItemMode = true;
-            DataContext = null;
 
-            idTextBox.Visibility = Visibility.Collapsed;
+            _itemsViewSource.Add(new Item("New Item"));
+            itemListView.SelectedIndex = _itemsViewSource.Count - 1;
+            itemListView.IsEnabled = false;
         }
 
         private void SetupEntryDisplayMode()
         {
+            if (_newItemMode)
+            {
+                /*
+                 * if we are in this mode, this definitely mean that:
+                 * the itemListView.SelectedIndex = _itemsViewSource.Count - 1;
+                 * and that item is the new item we've added but never committed,
+                 * so remove it and continue normally
+                 */
+
+                _itemsViewSource.RemoveAt(_itemsViewSource.Count - 1);
+            }
+
             BtnCancel.Visibility = Visibility.Collapsed;
-            idTextBox.Visibility = Visibility.Visible;
 
             ItemDetailView.Background = _defaultColorBrush;
             _newItemMode = false;
-            DataContext = itemListView;
+
+            itemListView.IsEnabled = true;
         }
 
-        private void BtnNewCompany_Click(object sender, RoutedEventArgs e)
+        private void BtnNewTransaction_Click(object sender, RoutedEventArgs e)
         {
+            var targetItem = _itemsViewSource[itemListView.SelectedIndex];
+
             ItemCompanyEntryWindow companyEntry =
-                new ItemCompanyEntryWindow(SelectedItem.Id, _dataContextModel.Companies.ToList())
-            {
-                Owner = Application.Current.MainWindow
-            };
+                new ItemCompanyEntryWindow(targetItem, DataModel.Companies.ToList())
+                {
+                    Owner = Application.Current.MainWindow
+                };
             var result = companyEntry.ShowDialog();
 
             //as soon as we get a Dialog result, we continue executing here
             if (result.HasValue && result.Value)
             {
-                _itemsViewSource[itemListView.SelectedIndex].Transactions.Add(companyEntry.NewTransaction);
-                transactionsDataGrid.UpdateLayout();
+
+                switch (companyEntry.NewTransaction.ItemTransactionType)
+                {
+                    case ItemTransaction.TransactionType.Buy:
+                        SelectedItem.Quantity += companyEntry.NewTransaction.Quantity;
+                        break;
+                    case ItemTransaction.TransactionType.Sell:
+                        if (SelectedItem.Quantity - companyEntry.NewTransaction.Quantity < 0)
+                        {
+                            MessageBox.Show("The Required Quantity in the Transaction is higher than stock!\nif you dont wish to continue, dont Apply Changes and restart",
+                                "Quantity Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        }
+                        targetItem.Quantity -= companyEntry.NewTransaction.Quantity;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+
+                quantityTextBox.Text = targetItem.Quantity.ToString();
+                targetItem.Transactions.Add(companyEntry.NewTransaction);
+                DataModel.UpdateItemStats(targetItem);
+                transactionsDataGrid.Items.Refresh();
             }
         }
     }

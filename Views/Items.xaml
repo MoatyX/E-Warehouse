@@ -11,12 +11,13 @@
              d:DesignHeight="450" d:DesignWidth="800" Loaded="UserControl_Loaded">
     <UserControl.Resources>
         <Style x:Key="NavButton" TargetType="{x:Type Button}" BasedOn="{x:Null}">
-            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontSize" Value="14"/>
             <Setter Property="Margin" Value="2,2,2,0"/>
             <Setter Property="Height" Value="auto"/>
         </Style>
         <CollectionViewSource x:Key="itemViewSource" d:DesignSource="{d:DesignInstance {x:Type models:Item}, CreateList=True}"/>
         <CollectionViewSource x:Key="itemTransactionsViewSource" Source="{Binding Transactions, Source={StaticResource itemViewSource}}"/>
+        <CollectionViewSource x:Key="itemStatisticViewSource" d:DesignSource="{d:DesignInstance {x:Type models:ItemStatistic}, CreateList=True}"/>
     </UserControl.Resources>
     <Grid DataContext="{StaticResource itemViewSource}">
         <Grid.RowDefinitions>
@@ -25,19 +26,20 @@
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="5*"/>
+            <ColumnDefinition Width="7*"/>
+            <ColumnDefinition Width="8*"/>
         </Grid.ColumnDefinitions>
         <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="5,2,2,0" VerticalAlignment="Top"
-                    Background="Gainsboro">
-            <Button Name="BtnAdd" Content="New Item" FontSize="12"
+                    Background="Gainsboro" Grid.ColumnSpan="2" Height="24">
+            <Button Name="BtnAdd" Content="New Item"
                     Width="auto" Style="{StaticResource NavButton}" Click="BtnAdd_Click"/>
-            <Button Name="BtnDelete" Content="Delete Item" FontSize="11" Background="Red"
+            <Button Name="BtnDelete" Content="Delete Item" Background="Red"
                     Width="Auto" Style="{StaticResource NavButton}" Click="BtnDelete_Click"/>
-            <Button Name="BtnCommit" Content="Apply Changes" Background="Green" FontSize="11"
-                    Width="80" Style="{StaticResource NavButton}" Click="BtnCommit_Click"/>
+            <Button Name="BtnCommit" Content="Apply Changes" Background="Green"
+                    Width="auto" Style="{StaticResource NavButton}" Click="BtnCommit_Click"/>
             <Button x:Name="BtnCancel" Style="{StaticResource NavButton}" Visibility="Collapsed" Click="BtnCancel_OnClick" Content="Cancel" Width="75" IsCancel="True"/>
-            <Button x:Name="BtnNewCompany" Style="{StaticResource NavButton}" Visibility="Visible" Content="Add Company Record" Width="auto" IsCancel="True" Click="BtnNewCompany_Click"/>
+            <Button x:Name="BtnNewTransaction" Style="{StaticResource NavButton}" Visibility="Visible" Content="Add Transaction Record" Width="auto" IsCancel="True" Click="BtnNewTransaction_Click"/>
         </StackPanel>
         <ListView x:Name="itemListView" SelectionMode="Single" Grid.RowSpan="3" ItemsSource="{Binding}" Grid.ColumnSpan="1" Margin="0,0,0,-0.4">
             <ListView.View>
@@ -65,7 +67,44 @@
                 </Style>
             </ListView.ItemContainerStyle>
         </ListView>
-        <Grid x:Name="ItemDetailView" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Top" Height="auto" Margin="0,38,0,0" Grid.RowSpan="2" Width="590">
+        <st:StackPanel Grid.Row="2" Grid.Column="1" Orientation="Vertical" MarginBetweenChildren="2" Margin="10,9.6" Grid.ColumnSpan="2">
+            <Label Content="Item's Transactions Data: " Background="Aquamarine"></Label>
+            <DataGrid x:Name="transactionsDataGrid" IsReadOnly="True" AutoGenerateColumns="False" EnableRowVirtualization="True" ItemsSource="{Binding Source={StaticResource itemTransactionsViewSource}}" RowDetailsVisibilityMode="VisibleWhenSelected">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Binding="{Binding Company.Name}" Header="Company Name" Width="SizeToHeader"/>
+                    <DataGridTextColumn Binding="{Binding ItemTransactionType}" Header="Transaction Type" Width="SizeToHeader"/>
+                    <DataGridTextColumn Binding="{Binding TransactionDate, StringFormat={}{0:dd/MM/yyyy}}" Header="Transaction Date" MinWidth="100" Width="SizeToHeader"/>
+                    <DataGridTextColumn Binding="{Binding Price}" Header="Unit Price" MinWidth="80" Width="SizeToHeader"/>
+                    <DataGridTextColumn Binding="{Binding Quantity}" Header="Quantity" MinWidth="80" Width="SizeToHeader"/>
+                </DataGrid.Columns>
+            </DataGrid>
+
+        </st:StackPanel>
+        <Grid x:Name="ItemDetailView" MinWidth="120" Grid.Column="1" HorizontalAlignment="Left" Grid.Row="1" VerticalAlignment="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition MinWidth="150" Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Label Content="Description:" Grid.Column="0" HorizontalAlignment="Left" Margin="3" Grid.Row="0" VerticalAlignment="Center"/>
+            <TextBox x:Name="descriptionTextBox" Grid.Column="1" Grid.RowSpan="2" MinHeight="80" Margin="3" Grid.Row="0" Text="{Binding Description, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}"/>
+            <Label Content="Name:" Grid.Column="0" HorizontalAlignment="Left" Margin="3" Grid.Row="2" VerticalAlignment="Center"/>
+            <TextBox x:Name="nameTextBox" Grid.Column="1" Height="23" Margin="3" Grid.Row="2" Text="{Binding Name, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" VerticalAlignment="Center"/>
+            <Label Content="Part Number:" Grid.Column="0" HorizontalAlignment="Left" Margin="3" Grid.Row="3" VerticalAlignment="Center"/>
+            <TextBox x:Name="partNumberTextBox" Grid.Column="1" Height="23" Margin="3" Grid.Row="3" Text="{Binding PartNumber, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" VerticalAlignment="Center"/>
+            <Label Content="Quantity:" Grid.Column="0" HorizontalAlignment="Left" Margin="3" Grid.Row="4" VerticalAlignment="Center"/>
+            <TextBox x:Name="quantityTextBox" Grid.Column="1" Height="23" Margin="3" Grid.Row="4" Text="{Binding Quantity, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" VerticalAlignment="Center"/>
+            <Label Content="Sell Price:" Grid.Column="0" HorizontalAlignment="Left" Margin="3" Grid.Row="5" VerticalAlignment="Center"/>
+            <TextBox x:Name="sellPriceTextBox" Grid.Column="1" Height="23" Margin="3" Grid.Row="5" Text="{Binding SellPrice, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" VerticalAlignment="Center"/>
+        </Grid>
+        <Grid x:Name="ItemStatsGrid" Grid.Column="2" HorizontalAlignment="Left" Grid.Row="1" VerticalAlignment="Top">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
@@ -76,32 +115,17 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <Label Content="Buy Price:" Grid.Column="0" HorizontalAlignment="Left" Margin="3" Grid.Row="1" VerticalAlignment="Center"/>
-            <TextBox x:Name="buyPriceTextBox" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="3" Grid.Row="1" Text="{Binding BuyPrice, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" VerticalAlignment="Center" Width="120"/>
-            <Label Content="Id:" Grid.Column="0" HorizontalAlignment="Left" Margin="3" Grid.Row="0" VerticalAlignment="Center"/>
-            <Label x:Name="idTextBox" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="3" Grid.Row="0" Content="{Binding Id, Mode=OneWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" VerticalAlignment="Center" Width="120"/>
-            <Label Content="Name:" Grid.Column="0" HorizontalAlignment="Left" Margin="3" Grid.Row="2" VerticalAlignment="Center"/>
-            <TextBox x:Name="ItemName" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="3" Grid.Row="2" Text="{Binding Name, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" VerticalAlignment="Center" Width="120"/>
-            <Label Content="Part Number:" Grid.Column="0" HorizontalAlignment="Left" Margin="3" Grid.Row="3" VerticalAlignment="Center"/>
-            <TextBox x:Name="ItemPartNumber" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="3" Grid.Row="3" Text="{Binding PartNumber, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" VerticalAlignment="Center" Width="120"/>
-            <Label Content="Quantity:" Grid.Column="0" HorizontalAlignment="Left" Margin="3" Grid.Row="4" VerticalAlignment="Center"/>
-            <TextBox x:Name="quantityTextBox" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="3" Grid.Row="4" Text="{Binding Quantity, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" VerticalAlignment="Center" Width="120"/>
-            <Label Content="Sell Price:" Grid.Column="0" HorizontalAlignment="Left" Margin="3" Grid.Row="5" VerticalAlignment="Center"/>
-            <TextBox x:Name="sellPriceTextBox" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="3" Grid.Row="5" Text="{Binding SellPrice, Mode=TwoWay, NotifyOnValidationError=true, ValidatesOnExceptions=true}" VerticalAlignment="Center" Width="120"/>
+            <Label Content="item Statistics: " FontWeight="Bold" FontSize="13" Grid.Row="0"></Label>
+            <Label Content="Avg Buying Price:" Grid.Column="0" HorizontalAlignment="Left" Margin="3" Grid.Row="1" VerticalAlignment="Center"/>
+            <Label Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="3" Grid.Row="1" Content="{Binding ItemStatistic.AvgBuyingPrice}" VerticalAlignment="Center" Width="120"/>
+            <Label Content="Avg Selling Price:" Grid.Column="0" HorizontalAlignment="Left" Margin="3" Grid.Row="2" VerticalAlignment="Center"/>
+            <Label Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="3" Grid.Row="2" Content="{Binding ItemStatistic.AvgSellingPrice}" VerticalAlignment="Center" Width="120"/>
+            <Label Content="Lowest Buying Price:" Grid.Column="0" HorizontalAlignment="Left" Margin="3" Grid.Row="3" VerticalAlignment="Center"/>
+            <Label Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="3" Grid.Row="3" Content="{Binding ItemStatistic.LowestBuyingPrice}" VerticalAlignment="Center" Width="120"/>
+            <Label Content="Lowest Buying Company" Grid.Column="0" HorizontalAlignment="Left" Margin="3" Grid.Row="4" VerticalAlignment="Center"/>
+            <Label Grid.Column="1" HorizontalAlignment="Left" Height="auto" Grid.Row="4" Content="{Binding ItemStatistic.LowestBuyingCompany.Name}" VerticalAlignment="Center" Width="120"/>
         </Grid>
-        <st:StackPanel Grid.Row="2" Grid.Column="1" Orientation="Vertical" MarginBetweenChildren="2" Margin="10">
-            <Label Content="Item's NewTransactions Data: " Background="Aquamarine"></Label>
-            <DataGrid x:Name="transactionsDataGrid" AutoGenerateColumns="False" EnableRowVirtualization="True" ItemsSource="{Binding Source={StaticResource itemTransactionsViewSource}}" RowDetailsVisibilityMode="VisibleWhenSelected">
-                <DataGrid.Columns>
-                    <DataGridTextColumn x:Name="companyColumn" Binding="{Binding Company.Name}" Header="Company Name" Width="SizeToHeader"/>
-                    <DataGridTextColumn x:Name="itemTransactionTypeColumn" Binding="{Binding ItemTransactionType}" Header="NewTransaction Type" Width="SizeToHeader"/>
-                    <DataGridTextColumn x:Name="priceColumn" Binding="{Binding Price}" Header="Price" MinWidth="80" Width="SizeToHeader"/>
-                </DataGrid.Columns>
-            </DataGrid>
-
-        </st:StackPanel>
 
     </Grid>
 </UserControl>

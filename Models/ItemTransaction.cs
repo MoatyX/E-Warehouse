@@ -23,7 +23,10 @@ namespace E_Warehouse.Models
         public int CompanyId { get; set; }
 
         public TransactionType ItemTransactionType { get; set; }
+        public DateTime TransactionDate { get; set; }
 
-        public float Price { get; set; }
+        public double Price { get; set; }
+
+        public int Quantity { get; set; }
     }
 }

@@ -23,16 +23,16 @@ namespace E_Warehouse.Views.Modals
     public partial class ItemCompanyEntryWindow : Window
     {
         public IEnumerable<string> CompanyNames { get; } //used solely by the textbox to do auto complete
-        private readonly int _itemId;
+        private readonly Item _item;
         private readonly IEnumerable<Company> _companies;
 
         public ItemTransaction NewTransaction { get; private set; }
 
-        private float Price
+        private double Price
         {
             get
             {
-                bool success = float.TryParse(PriceTextbox.Text, NumberStyles.Any, CultureInfo.CurrentCulture,
+                bool success = double.TryParse(PriceTextbox.Text, NumberStyles.Any, CultureInfo.CurrentCulture,
                     out var output);
 
                 if (success) return output;
@@ -44,11 +44,26 @@ namespace E_Warehouse.Views.Modals
             }
         }
 
-        public ItemCompanyEntryWindow(int itemId, IEnumerable<Company> companies = null)
+        private int Quantity
+        {
+            get
+            {
+                bool success = int.TryParse(QuantityTextbox.Text, NumberStyles.Any, CultureInfo.CurrentCulture,
+                    out var output);
+
+                if (success) return Math.Abs(output);
+
+                MessageBox.Show("Please Enter Numbers Only!", "Invalid Input Type", MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+                return 0;
+            }
+        }
+
+        public ItemCompanyEntryWindow(Item item, IEnumerable<Company> companies = null)
         {
             InitializeComponent();
 
-            _itemId = itemId;
+            _item = item;
             _companies = companies;
 
             if (_companies != null) CompanyNames = _companies.Select(x => x.Name).ToArray();
@@ -62,30 +77,51 @@ namespace E_Warehouse.Views.Modals
         {
             var autoCompletedCompany = _companies.FirstOrDefault(x =>
                 x.Name.Equals(CompanyNameTextbox.Text, StringComparison.CurrentCultureIgnoreCase));
-            if (autoCompletedCompany != null)
+            if (autoCompletedCompany == null)
             {
-                var transType = (ItemTransaction.TransactionType) TransactionType.SelectedIndex;
-                NewTransaction = new ItemTransaction
+                var result =
+                    MessageBox.Show("Company is not found in the database and thus will be automatically created",
+                        "Company Name Not found", MessageBoxButton.OKCancel, MessageBoxImage.Information);
+                if (result == MessageBoxResult.OK)
                 {
-                    CompanyId = autoCompletedCompany.Id,
-                    ItemId = _itemId,
-                    Price = Price,
-                    ItemTransactionType = transType
-                };
-
-                if (transType == ItemTransaction.TransactionType.Buy)
-                {
-                    autoCompletedCompany.IsSourceCompany = true;
+                    autoCompletedCompany = new Company
+                    {
+                        Name = CompanyNameTextbox.Text,
+                        Items = new List<Item>(),
+                    };
                 }
             }
-                
 
-            this.DialogResult = autoCompletedCompany != null;
+            if (autoCompletedCompany != null)
+            {
+                CreateTransaction(autoCompletedCompany);
+                DialogResult = true;
+            }
+            else DialogResult = false;
+        }
+
+        private void CreateTransaction(Company company)
+        {
+            var transType = (ItemTransaction.TransactionType)TransactionType.SelectedIndex;
+            NewTransaction = new ItemTransaction
+            {
+                Company = company,
+                Price = Price,
+                ItemTransactionType = transType,
+                TransactionDate = TransactionDate.DisplayDate,
+                Quantity = Quantity
+            };
+
+            if (transType == ItemTransaction.TransactionType.Buy)
+            {
+                company.IsSourceCompany = true;
+                company.Items.Add(_item);
+            }
         }
 
         private void CancelBtn_OnClick(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            DialogResult = false;
         }
     }
 }

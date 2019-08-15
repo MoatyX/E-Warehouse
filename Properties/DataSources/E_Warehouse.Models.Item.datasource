@@ -7,16 +7,28 @@
 -->
 <GenericObjectDataSource DisplayName="Item" Version="1.0" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
    <Children>
-      <GenericObjectDataSource DisplayName="SourceCompanies" Version="1.0">
-         <TypeInfo>E_Warehouse.Models.Company, E-Warehouse, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</TypeInfo>
+      <GenericObjectDataSource DisplayName="ItemStatistic" Version="1.0">
+         <TypeInfo>E_Warehouse.Models.ItemStatistic, E-Warehouse, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</TypeInfo>
          <TypeUISetting>
             <PropertyUISettings>
-               <PropertyUISetting Name="Item.Transactions.Company">
+               <PropertyUISetting Name="Item.ItemStatistic">
                   <ControlSettings>
                      <ControlSetting ArtifactName="Microsoft:System.Windows:WPF">
                         <BindableControlInfo Name="Details" Type="Microsoft.VSDesigner.Data.DataForm.Windows.DetailView" />
                      </ControlSetting>
                   </ControlSettings>
+               </PropertyUISetting>
+            </PropertyUISettings>
+         </TypeUISetting>
+      </GenericObjectDataSource>
+      <GenericObjectDataSource DisplayName="SourceCompanies" Version="1.0">
+         <TypeInfo>E_Warehouse.Models.Company, E-Warehouse, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</TypeInfo>
+         <TypeUISetting>
+            <PropertyUISettings>
+               <PropertyUISetting Name="Item.Transactions.Company">
+                  <ControlSettings><ControlSetting ArtifactName="Microsoft:System.Windows:WPF" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+                        <BindableControlInfo Name="Details" Type="Microsoft.VSDesigner.Data.DataForm.Windows.DetailView" />
+                     </ControlSetting></ControlSettings>
                </PropertyUISetting>
             </PropertyUISettings>
          </TypeUISetting>

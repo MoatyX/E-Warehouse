@@ -13,5 +13,7 @@ namespace E_Warehouse.Data
         public DbSet<Item> Items { get; set; }
         public DbSet<Company> Companies { get; set; }
         public DbSet<ItemTransaction> ItemTransactions { get; set; }
+
+        public DbSet<ItemStatistic> ItemStatistics { get; set; }
     }
 }

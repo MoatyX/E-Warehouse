@@ -8,8 +8,8 @@
         xmlns:modals="clr-namespace:E_Warehouse.Views.Modals"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
-        Title="New Source Company"  Height="200" Width="450" WindowStyle="ToolWindow" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
-    <st:AutoGrid Rows="Auto,Auto,auto,auto,*, 28" Columns="Auto, *" ChildMargin="3" Margin="0,5,0,0">
+        Title="New Source Company"  Height="250" Width="450" WindowStyle="ToolWindow" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+    <st:AutoGrid Rows="Auto,Auto,auto,auto, auto,*, 28" Columns="Auto, *" ChildMargin="3" Margin="0,5,0,0">
         <Label Content="Company Name: "></Label>
         <TextBox Name="CompanyNameTextbox"
             wpfTextBoxAutoComplete:AutoCompleteBehavior.AutoCompleteItemsSource="{Binding CompanyNames}" 
@@ -19,11 +19,16 @@
         <Label Content="NewTransaction Type"></Label>
         <ComboBox Name="TransactionType" SelectedIndex="0"></ComboBox>
 
-        <Label Content="Price"></Label>
+        <Label Content="Unit Price"></Label>
         <TextBox Name="PriceTextbox"></TextBox>
 
         <Label Content="Transaction Date"></Label>
         <DatePicker Name="TransactionDate" SelectedDate="{x:Static sys:DateTime.Today}" ></DatePicker>
+
+        <Label Content="Quantity"></Label>
+        <StackPanel Orientation="Horizontal">
+            <TextBox Name="QuantityTextbox" HorizontalAlignment="Left" Width="100"></TextBox>
+        </StackPanel>
 
         <Label />
         <Label />
