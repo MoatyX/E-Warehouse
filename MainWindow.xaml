@@ -24,6 +24,7 @@
         </Grid.RowDefinitions>
         <Menu Grid.Row="0" Grid.ColumnSpan="999">
             <MenuItem Header="_File">
+                <MenuItem Header="_Open Excel Sheet" Click="MenuItem_Click"></MenuItem>
                 <Separator />
                 <MenuItem Header="_Exit" Click="MenuItem_Exit_OnClick" />
             </MenuItem>

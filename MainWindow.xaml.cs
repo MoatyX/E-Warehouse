@@ -1,6 +1,7 @@
 ﻿using System.Data.Entity;
 using System.Windows;
 using E_Warehouse.Data;
+using E_Warehouse.Utils;
 using E_Warehouse.Views;
 
 namespace E_Warehouse
@@ -46,6 +47,11 @@ namespace E_Warehouse
         private void MenuItem_DB_Items_OnClick(object sender, RoutedEventArgs e)
         {
             DataContext = new Items();
+        }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            ExcelHelper.OpenProcessFile();
         }
     }
 }

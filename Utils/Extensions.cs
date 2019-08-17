@@ -17,5 +17,12 @@ namespace E_Warehouse.Utils
         {
             return new string(input.ToCharArray().Where(c => !char.IsWhiteSpace(c)).ToArray());
         }
+
+        public static void PrintColoredLine(ConsoleColor color, string value)
+        {
+            Console.ForegroundColor = color;
+            Console.WriteLine(value);
+            Console.ResetColor();
+        }
     }
 }
