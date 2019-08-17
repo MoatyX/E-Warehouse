@@ -26,6 +26,11 @@ namespace E_Warehouse.Views
             InitializeComponent();
         }
 
+        public void PutItem(params string[] items)
+        {
+            SearchTextbox.Text = string.Join(",", items);
+        }
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             var text = SearchTextbox.Text;

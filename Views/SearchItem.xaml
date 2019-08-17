@@ -4,15 +4,16 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:E_Warehouse.Views"
+             xmlns:st="http://schemas.spicytaco.io/"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Vertical">
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal">
-                <Label Content="Item Part Number:" FontSize="14" FontStyle="Italic" FontWeight="Bold"/>
-                <TextBox Name="SearchTextbox" MinWidth="150" MinHeight="20" Margin="10,0,0,0"></TextBox>
-            </StackPanel>
+    <Grid VerticalAlignment="Center">
+        <st:StackPanel MaxWidth="300" >
+            <Label Content="Part Number Search:" FontWeight="Bold"></Label>
+            <TextBox Name="SearchTextbox" ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                     ScrollViewer.CanContentScroll="True"  MinHeight="40"></TextBox>
             <Button Content="Search" Width="60" HorizontalAlignment="Right" Margin="0,5,0,0" Click="Button_Click"></Button>
-        </StackPanel>
+        </st:StackPanel>
     </Grid>
 </UserControl>

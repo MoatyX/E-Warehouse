@@ -24,7 +24,8 @@
         </Grid.RowDefinitions>
         <Menu Grid.Row="0" Grid.ColumnSpan="999">
             <MenuItem Header="_File">
-                <MenuItem Header="_Open Excel Sheet" Click="MenuItem_Click"></MenuItem>
+                <MenuItem Header="_Search Items From Excel" Click="SearchExcel_Click"></MenuItem>
+                <MenuItem Header="_Import Items From Excel" Click="ImportExcel_OnClick"></MenuItem>
                 <Separator />
                 <MenuItem Header="_Exit" Click="MenuItem_Exit_OnClick" />
             </MenuItem>

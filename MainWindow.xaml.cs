@@ -36,7 +36,15 @@ namespace E_Warehouse
         /// <param name="e"></param>
         private void MenuItem_Search_OnClick(object sender, RoutedEventArgs e)
         {
-            DataContext = new SearchItem();
+            OpenItemSearchView();
+        }
+
+        public void OpenItemSearchView(params string[] preparedItems)
+        {
+            var context = new SearchItem();
+            context.PutItem(preparedItems);
+
+            DataContext = context;
         }
 
         private void MenuItem_DB_AllCompanies_OnClick(object sender, RoutedEventArgs e)
@@ -49,9 +57,29 @@ namespace E_Warehouse
             DataContext = new Items();
         }
 
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Extract items from an excel sheet and search for them
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SearchExcel_Click(object sender, RoutedEventArgs e)
         {
-            ExcelHelper.OpenProcessFile();
+            ExcelHelper.OpenProcessFile(DoneCallback);
+        }
+
+        private void DoneCallback(string[] obj)
+        {
+            OpenItemSearchView(obj);
+        }
+
+        /// <summary>
+        /// Import
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ImportExcel_OnClick(object sender, RoutedEventArgs e)
+        {
+            
         }
     }
 }

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Win32;
 using System.Windows;
+using System.Windows.Documents;
+using E_Warehouse.Models;
 using E_Warehouse.Views.Modals;
 using ExcelDataReader;
 
@@ -10,7 +12,7 @@ namespace E_Warehouse.Utils
 {
     public static class ExcelHelper
     {
-        public static void OpenProcessFile()
+        public static void OpenProcessFile(Action<string[]> doneCallback)
         {
             var fileDialog = new OpenFileDialog()
             {
@@ -45,6 +47,7 @@ namespace E_Warehouse.Utils
                 };
                 //store which column that we care about has which actual column index in the excel sheet
                 Dictionary<string, int> columns = new Dictionary<string, int>(4);
+                List<string> itemNumbers = new List<string>();
 
                 uint r = 0;
                 uint maxRows = Convert.ToUInt32(settingsWindow.MaxRowTextBox.Text);
@@ -77,13 +80,24 @@ namespace E_Warehouse.Utils
                         var itemNo = reader.GetString(columns[partNoCol]);
                         var price = reader.GetDouble(columns[priceCol]);
                         var desc = reader.GetString(columns[descCol]);
-                        var quat = reader.GetDouble(columns[quantityCol]);
+                        var quat = (int)reader.GetDouble(columns[quantityCol]);
+                        //Item item = new Item()
+                        //{
+                        //    PartNumber = itemNo,
+                        //    Description = desc,
+                        //    Quantity = quat,
+                        //    SellPrice = price
+                        //};
+
+                        itemNumbers.Add(itemNo);
                         Console.WriteLine($"Item: {itemNo} price: {price}, desc: {desc}, quant: {quat}");
 
                         //TODO: advance to the next sheet
                     }
                     
                 }
+
+                if (itemNumbers.Count > 0) doneCallback(itemNumbers.ToArray());
 
             }
         }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Data;
 
 namespace E_Warehouse.Models
 {
@@ -29,7 +30,7 @@ namespace E_Warehouse.Models
         public int Id { get; set; }
         public string Name { get; set; }
 
-        [Required]
+        [Required(AllowEmptyStrings = false)]
         public string PartNumber { get; set; }
         public string Description { get; set; }
         public double SellPrice { get; set; }
