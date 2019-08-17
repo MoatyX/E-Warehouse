@@ -104,6 +104,9 @@
     <Compile Include="Views\Items.xaml.cs">
       <DependentUpon>Items.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Modals\ExcelReaderSettings.xaml.cs">
+      <DependentUpon>ExcelReaderSettings.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Modals\ItemTransactionEntryWindow.xaml.cs">
       <DependentUpon>ItemTransactionEntryWindow.xaml</DependentUpon>
     </Compile>
@@ -128,6 +131,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Items.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Modals\ExcelReaderSettings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Win32;
 using System.Windows;
+using E_Warehouse.Views.Modals;
 using ExcelDataReader;
 
 namespace E_Warehouse.Utils
@@ -20,26 +21,68 @@ namespace E_Warehouse.Utils
             var x = fileDialog.ShowDialog(Application.Current.MainWindow);
             if(!x.Value) return;
 
+            ExcelReaderSettings settingsWindow = new ExcelReaderSettings();
+            settingsWindow.Owner = Application.Current.MainWindow;
+            var result = settingsWindow.ShowDialog();
+
+            if (!result.HasValue || !result.Value) return;      //the user pressed cancel
+
             string filename = fileDialog.FileName;
             Extensions.PrintColoredLine(ConsoleColor.Blue, $"file name: {filename}");
 
             using (var reader = ExcelReaderFactory.CreateReader(fileDialog.OpenFile()))
             {
-
-                Console.WriteLine(reader.ResultsCount);
-                Console.WriteLine(reader.FieldCount);
-                Console.WriteLine(reader.RowCount);
-
-                for (int i = 0; i < reader.FieldCount; i++)
+                var partNoCol = settingsWindow.PartNoTextBox.Text;
+                var quantityCol = settingsWindow.QuantityTextBox.Text;
+                var descCol = settingsWindow.DescriptionTextBox.Text;
+                var priceCol = settingsWindow.PriceTextBox.Text;
+                var importantColumns = new string[]
                 {
-                    while (reader.Read())
-                    {
-                        if (reader.IsDBNull(i)) continue;
-                        Console.WriteLine(reader.GetFieldType(i));
-                    }
+                    partNoCol,
+                    quantityCol,
+                    descCol,
+                    priceCol
+                };
+                //store which column that we care about has which actual column index in the excel sheet
+                Dictionary<string, int> columns = new Dictionary<string, int>(4);
 
-                    if (i != reader.FieldCount - 1)
-                        reader.Reset();
+                uint r = 0;
+                uint maxRows = Convert.ToUInt32(settingsWindow.MaxRowTextBox.Text);
+
+                while (reader.Read() && r < maxRows)
+                {
+                    r++;
+
+                    //discover the important columns
+                    if (columns.Count < 4)
+                    {
+                        for (int i = 0; i < reader.FieldCount; i++)
+                        {
+                            if (reader.IsDBNull(i)) continue;
+                            if (reader.GetFieldType(i) == typeof(string))
+                            {
+                                var value = reader.GetString(i);
+                                if (importantColumns.Contains(value, StringComparer.CurrentCultureIgnoreCase))
+                                {
+                                    columns.Add(value, i);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //read columns data
+                        if(reader.IsDBNull(columns[partNoCol])) continue;
+                        
+                        var itemNo = reader.GetString(columns[partNoCol]);
+                        var price = reader.GetDouble(columns[priceCol]);
+                        var desc = reader.GetString(columns[descCol]);
+                        var quat = reader.GetDouble(columns[quantityCol]);
+                        Console.WriteLine($"Item: {itemNo} price: {price}, desc: {desc}, quant: {quat}");
+
+                        //TODO: advance to the next sheet
+                    }
+                    
                 }
 
             }
