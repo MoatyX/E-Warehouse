@@ -5,7 +5,9 @@ namespace E_Warehouse.Models
     public class ItemStatistic
     {
         [ForeignKey("Item")]
-        public int Id { get; set; }
+        public string Id { get; set; }
+
+        public int ItemStatisticId { get; set; }
 
         public virtual Item Item { get; set; }
 

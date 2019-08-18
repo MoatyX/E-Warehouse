@@ -21,20 +21,20 @@ namespace E_Warehouse.Migrations
                 "dbo.Items",
                 c => new
                     {
-                        Id = c.Int(nullable: false, identity: true),
+                        PartNumber = c.String(nullable: false, maxLength: 128),
                         Name = c.String(),
-                        PartNumber = c.String(),
                         Description = c.String(),
                         SellPrice = c.Double(nullable: false),
                         Quantity = c.Int(nullable: false),
                     })
-                .PrimaryKey(t => t.Id);
+                .PrimaryKey(t => t.PartNumber);
             
             CreateTable(
                 "dbo.ItemStatistics",
                 c => new
                     {
-                        Id = c.Int(nullable: false),
+                        Id = c.String(nullable: false, maxLength: 128),
+                        ItemStatisticId = c.Int(nullable: false),
                         AvgSellingPrice = c.Double(nullable: false),
                         AvgBuyingPrice = c.Double(nullable: false),
                         LowestBuyingPrice = c.Double(nullable: false),
@@ -57,40 +57,41 @@ namespace E_Warehouse.Migrations
                         TransactionDate = c.DateTime(nullable: false),
                         Price = c.Double(nullable: false),
                         Quantity = c.Int(nullable: false),
+                        Item_PartNumber = c.String(maxLength: 128),
                     })
                 .PrimaryKey(t => t.Id)
                 .ForeignKey("dbo.Companies", t => t.CompanyId, cascadeDelete: true)
-                .ForeignKey("dbo.Items", t => t.ItemId, cascadeDelete: true)
-                .Index(t => t.ItemId)
-                .Index(t => t.CompanyId);
+                .ForeignKey("dbo.Items", t => t.Item_PartNumber)
+                .Index(t => t.CompanyId)
+                .Index(t => t.Item_PartNumber);
             
             CreateTable(
                 "dbo.ItemCompanies",
                 c => new
                     {
-                        Item_Id = c.Int(nullable: false),
+                        Item_PartNumber = c.String(nullable: false, maxLength: 128),
                         Company_Id = c.Int(nullable: false),
                     })
-                .PrimaryKey(t => new { t.Item_Id, t.Company_Id })
-                .ForeignKey("dbo.Items", t => t.Item_Id, cascadeDelete: true)
+                .PrimaryKey(t => new { t.Item_PartNumber, t.Company_Id })
+                .ForeignKey("dbo.Items", t => t.Item_PartNumber, cascadeDelete: true)
                 .ForeignKey("dbo.Companies", t => t.Company_Id, cascadeDelete: true)
-                .Index(t => t.Item_Id)
+                .Index(t => t.Item_PartNumber)
                 .Index(t => t.Company_Id);
             
         }
         
         public override void Down()
         {
-            DropForeignKey("dbo.ItemTransactions", "ItemId", "dbo.Items");
+            DropForeignKey("dbo.ItemTransactions", "Item_PartNumber", "dbo.Items");
             DropForeignKey("dbo.ItemTransactions", "CompanyId", "dbo.Companies");
             DropForeignKey("dbo.ItemCompanies", "Company_Id", "dbo.Companies");
-            DropForeignKey("dbo.ItemCompanies", "Item_Id", "dbo.Items");
+            DropForeignKey("dbo.ItemCompanies", "Item_PartNumber", "dbo.Items");
             DropForeignKey("dbo.ItemStatistics", "LowestBuyingCompany_Id", "dbo.Companies");
             DropForeignKey("dbo.ItemStatistics", "Id", "dbo.Items");
             DropIndex("dbo.ItemCompanies", new[] { "Company_Id" });
-            DropIndex("dbo.ItemCompanies", new[] { "Item_Id" });
+            DropIndex("dbo.ItemCompanies", new[] { "Item_PartNumber" });
+            DropIndex("dbo.ItemTransactions", new[] { "Item_PartNumber" });
             DropIndex("dbo.ItemTransactions", new[] { "CompanyId" });
-            DropIndex("dbo.ItemTransactions", new[] { "ItemId" });
             DropIndex("dbo.ItemStatistics", new[] { "LowestBuyingCompany_Id" });
             DropIndex("dbo.ItemStatistics", new[] { "Id" });
             DropTable("dbo.ItemCompanies");

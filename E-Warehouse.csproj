@@ -85,13 +85,9 @@
     </ApplicationDefinition>
     <Compile Include="Converts\VisibilityToggleConverter.cs" />
     <Compile Include="Data\DataModelRepo.cs" />
-    <Compile Include="Migrations\201908151139165_Main.cs" />
-    <Compile Include="Migrations\201908151139165_Main.Designer.cs">
-      <DependentUpon>201908151139165_Main.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201908151331296_ItemFix.cs" />
-    <Compile Include="Migrations\201908151331296_ItemFix.Designer.cs">
-      <DependentUpon>201908151331296_ItemFix.cs</DependentUpon>
+    <Compile Include="Migrations\201908181507344_Main.cs" />
+    <Compile Include="Migrations\201908181507344_Main.Designer.cs">
+      <DependentUpon>201908181507344_Main.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ItemStatistic.cs" />
@@ -163,11 +159,8 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <EmbeddedResource Include="Migrations\201908151139165_Main.resx">
-      <DependentUpon>201908151139165_Main.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201908151331296_ItemFix.resx">
-      <DependentUpon>201908151331296_ItemFix.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201908181507344_Main.resx">
+      <DependentUpon>201908181507344_Main.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

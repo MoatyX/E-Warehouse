@@ -27,10 +27,9 @@ namespace E_Warehouse.Models
             };
         }
 
-        public int Id { get; set; }
         public string Name { get; set; }
 
-        [Required(AllowEmptyStrings = false)]
+        [Required(AllowEmptyStrings = false), Key]
         public string PartNumber { get; set; }
         public string Description { get; set; }
         public double SellPrice { get; set; }

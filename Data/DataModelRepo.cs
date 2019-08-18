@@ -5,6 +5,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using E_Warehouse.Models;
 
 namespace E_Warehouse.Data
@@ -110,7 +111,19 @@ namespace E_Warehouse.Data
 
         public int SaveChanges()
         {
-            return ItemModel.SaveChanges();
+            try
+            {
+                return ItemModel.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                MessageBox.Show(e.Message, "Saving Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Changes Will not be saved", "Saving Error", MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
+
+            return 0;
         }
     }
 }
