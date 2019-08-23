@@ -24,14 +24,15 @@ namespace E_Warehouse.Views
         private readonly ObservableCollection<Item> _itemsViewSource;
 
         private bool _newItemMode;
+        private bool _importMode;
         private Brush _defaultColorBrush;
 
-        public Item SelectedItem => itemListView.SelectedItem is Item item ? item : null;
+        public Item SelectedItem => itemListView?.SelectedItem is Item item ? item : null;
         private readonly bool _noMatch;
 
 
         /// <summary>
-        /// Constructor that takes 2 parameters, defining the behaviour of the view
+        /// Constructor that takes partNumber strings as an input to look them up from the database and display them in the UI
         /// </summary>
         /// <param name="viewMode">whether to display a single item, batch or all of them</param>
         /// <param name="partNumber">in the case of single item, partnumber is given to get that item</param>
@@ -43,7 +44,8 @@ namespace E_Warehouse.Views
             switch (partNumber.Length)
             {
                 case 0:
-                    _itemsViewSource = DataModel.Items;
+                    MessageBox.Show("Please Provide Item Numbers to preform the search", "No Item Numbers were given",
+                        MessageBoxButton.OK);
                     break;
                 case 1:
                     string itemToFind = partNumber[0];
@@ -68,6 +70,25 @@ namespace E_Warehouse.Views
         }
 
         /// <summary>
+        /// Constructor that takes Item objects to display them independent from the database
+        /// </summary>
+        /// <param name="items"></param>
+        public Items(params Item[] items)
+        {
+            InitializeComponent();
+
+            _itemsViewSource = new ObservableCollection<Item>(items);
+            _importMode = true;
+        }
+
+        public Items()
+        {
+            InitializeComponent();
+
+            _itemsViewSource = DataModel.Items;
+        }
+
+        /// <summary>
         /// shows an error dialog that the search was unsuccessful and returns to the search window
         /// </summary>
         private static void NoMatchFound()
@@ -89,11 +110,6 @@ namespace E_Warehouse.Views
             if (FindResource("itemViewSource") is CollectionViewSource itemsView)
             {
                 itemsView.Source = _itemsViewSource;
-            }
-
-            if (FindResource("itemStatisticViewSource") is CollectionViewSource itemView)
-            {
-                
             }
 
             _defaultColorBrush = itemListView.Background;
@@ -151,6 +167,16 @@ namespace E_Warehouse.Views
                 DataModel.AddItem(newItem);
 
                 _newItemMode = false;
+            }
+
+            if (_importMode)
+            {
+                foreach (var item in _itemsViewSource)
+                {
+                    DataModel.AddItem(item);
+                }
+
+                _importMode = false;
             }
 
             int changes = DataModel.SaveChanges();

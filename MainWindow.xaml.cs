@@ -1,6 +1,8 @@
 ﻿using System.Data.Entity;
+using System.Linq;
 using System.Windows;
 using E_Warehouse.Data;
+using E_Warehouse.Models;
 using E_Warehouse.Utils;
 using E_Warehouse.Views;
 
@@ -54,7 +56,13 @@ namespace E_Warehouse
 
         private void MenuItem_DB_Items_OnClick(object sender, RoutedEventArgs e)
         {
-            DataContext = new Items();
+            OpenItemsView();
+        }
+
+        private void OpenItemsView(params Item[] preparedItems)
+        {
+            if(preparedItems != null && preparedItems.Length > 0) DataContext = new Items(preparedItems);
+            else DataContext = new Items();
         }
 
         /// <summary>
@@ -64,12 +72,12 @@ namespace E_Warehouse
         /// <param name="e"></param>
         private void SearchExcel_Click(object sender, RoutedEventArgs e)
         {
-            ExcelHelper.OpenProcessFile(DoneCallback);
+            ExcelHelper.OpenProcessFile(SearchDoneCallback);
         }
 
-        private void DoneCallback(string[] obj)
+        private void SearchDoneCallback(Item[] obj)
         {
-            OpenItemSearchView(obj);
+            OpenItemSearchView(obj.Select(x => x.PartNumber).ToArray());
         }
 
         /// <summary>
@@ -79,7 +87,12 @@ namespace E_Warehouse
         /// <param name="e"></param>
         private void ImportExcel_OnClick(object sender, RoutedEventArgs e)
         {
-            
+            ExcelHelper.OpenProcessFile(ImportDoneCallback);
+        }
+
+        private void ImportDoneCallback(Item[] obj)
+        {
+            OpenItemsView(obj);
         }
     }
 }

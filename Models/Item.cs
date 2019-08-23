@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Data;
 
 namespace E_Warehouse.Models
 {
@@ -40,5 +37,11 @@ namespace E_Warehouse.Models
         public ICollection<Company> SourceCompanies { get; set; }
 
         public ICollection<ItemTransaction> Transactions { get; set; }
+
+        public override string ToString()
+        {
+            string output = $"(Item: {PartNumber}, Sell Price: {SellPrice}, Quantity: {Quantity})";
+            return output;
+        }
     }
 }

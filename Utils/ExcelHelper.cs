@@ -12,7 +12,12 @@ namespace E_Warehouse.Utils
 {
     public static class ExcelHelper
     {
-        public static void OpenProcessFile(Action<string[]> doneCallback)
+        /// <summary>
+        /// represent the number of features (columns in excel) that an item has
+        /// </summary>
+        private const int ItemFeaturesCount = 4;
+
+        public static void OpenProcessFile(Action<Item[]> doneCallback)
         {
             var fileDialog = new OpenFileDialog()
             {
@@ -40,14 +45,14 @@ namespace E_Warehouse.Utils
                 var priceCol = settingsWindow.PriceTextBox.Text;
                 var importantColumns = new string[]
                 {
-                    partNoCol,
-                    quantityCol,
-                    descCol,
-                    priceCol
+                    partNoCol.RemoveWhitespace(),
+                    quantityCol.RemoveWhitespace(),
+                    descCol.RemoveWhitespace(),
+                    priceCol.RemoveWhitespace()
                 };
                 //store which column that we care about has which actual column index in the excel sheet
                 Dictionary<string, int> columns = new Dictionary<string, int>(4);
-                List<string> itemNumbers = new List<string>();
+                List<Item> itemNumbers = new List<Item>();
 
                 uint r = 0;
                 uint maxRows = Convert.ToUInt32(settingsWindow.MaxRowTextBox.Text);
@@ -57,16 +62,25 @@ namespace E_Warehouse.Utils
                     r++;
 
                     //discover the important columns
-                    if (columns.Count < 4)
+                    if (columns.Count < ItemFeaturesCount)
                     {
+                        //this checks that we have done the discovery pass, but failed to match all columns 
+                        if (columns.Count > 0)
+                        {
+                            MessageBox.Show($"Failed To Match {ItemFeaturesCount - columns.Count} Columns names in the Excel Sheet",
+                                "Failed to Match Columns",
+                                MessageBoxButton.OK, MessageBoxImage.Error);
+                            break;
+                        }
                         for (int i = 0; i < reader.FieldCount; i++)
                         {
                             if (reader.IsDBNull(i)) continue;
                             if (reader.GetFieldType(i) == typeof(string))
                             {
                                 var value = reader.GetString(i);
-                                if (importantColumns.Contains(value, StringComparer.CurrentCultureIgnoreCase))
+                                if (importantColumns.Contains(value.RemoveWhitespace(), StringComparer.CurrentCultureIgnoreCase))
                                 {
+                                    Console.WriteLine($"found Feature: {value}");
                                     columns.Add(value, i);
                                 }
                             }
@@ -81,16 +95,16 @@ namespace E_Warehouse.Utils
                         var price = reader.GetDouble(columns[priceCol]);
                         var desc = reader.GetString(columns[descCol]);
                         var quat = (int)reader.GetDouble(columns[quantityCol]);
-                        //Item item = new Item()
-                        //{
-                        //    PartNumber = itemNo,
-                        //    Description = desc,
-                        //    Quantity = quat,
-                        //    SellPrice = price
-                        //};
+                        Item item = new Item()
+                        {
+                            PartNumber = itemNo,
+                            Description = desc,
+                            Quantity = quat,
+                            SellPrice = price
+                        };
 
-                        itemNumbers.Add(itemNo);
-                        Console.WriteLine($"Item: {itemNo} price: {price}, desc: {desc}, quant: {quat}");
+                        itemNumbers.Add(item);
+                        Console.WriteLine(item.ToString());
 
                         //TODO: advance to the next sheet
                     }
